@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Погода</string>
+    <string name="title_home">Сегодня</string>
+    <string name="title_forecast">Прогноз</string>
+    <string name="title_settings">Настройки</string>
+</resources>

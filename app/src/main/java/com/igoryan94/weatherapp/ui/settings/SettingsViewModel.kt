@@ -1,13 +1,13 @@
-package com.igoryan94.weatherapp.ui.notifications
+package com.igoryan94.weatherapp.ui.settings
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class NotificationsViewModel : ViewModel() {
+class SettingsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
+        value = "Здесь будет поиск города и настройки локации"
     }
     val text: LiveData<String> = _text
 }
