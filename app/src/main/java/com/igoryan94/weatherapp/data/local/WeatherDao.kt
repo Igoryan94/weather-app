@@ -7,7 +7,7 @@ import androidx.room.Query
 
 @Dao
 interface WeatherDao {
-    @Query("SELECT * FROM weather_cache WHERE id = 0")
+    @Query("SELECT * FROM weather_forecast WHERE id = 0")
     suspend fun getCachedWeather(): WeatherEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

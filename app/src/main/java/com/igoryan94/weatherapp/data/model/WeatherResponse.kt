@@ -26,7 +26,8 @@ data class CurrentDTO(
     @SerializedName("condition") val condition: ConditionDTO,
     @SerializedName("wind_kph") val windKph: Double,
     @SerializedName("humidity") val humidity: Int,
-    @SerializedName("feelslike_c") val feelsLikeC: Double
+    @SerializedName("feelslike_c") val feelsLikeC: Double,
+    @SerializedName("last_updated") val lastUpdated: String?
 )
 
 /**
