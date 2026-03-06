@@ -1,9 +1,7 @@
 package com.igoryan94.weatherapp.ui.home
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.igoryan94.weatherapp.databinding.FragmentHomeBinding
@@ -13,16 +11,13 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        // Получаем ViewModel через фабрику Dagger, если она настроена
+        val homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        // Подписка на обновление состояния
+        // Подписываемся на изменения состояния погоды
         homeViewModel.weatherState.observe(viewLifecycleOwner) { state ->
             with(binding) {
                 tvLocation.text = state.location
@@ -30,17 +25,13 @@ class HomeFragment : Fragment() {
                 tvTempRange.text = state.tempRange
                 tvHumidity.text = state.humidity
                 tvWindSpeed.text = state.windSpeed
-
-                // Простое заполнение строк прогноза
-                if (state.forecastDays.size >= 3) {
-                    tvDay1.text = state.forecastDays[0]
-                    tvDay2.text = state.forecastDays[1]
-                    tvDay3.text = state.forecastDays[2]
-                }
+                // Заполняем краткий статус из первого элемента списка
+                tvDay1.text = state.forecastDays[0]
             }
         }
 
-        return binding.root
+        // Выполняем первый запрос для Москвы
+        homeViewModel.fetchCurrentWeather("Moscow")
     }
 
     override fun onDestroyView() {
