@@ -11,6 +11,7 @@
         android:id="@+id/tvLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,9 +81,23 @@
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/tvForecastTitle">
 
-        <TextView android:id="@+id/tvDay1" android:layout_width="match_parent" android:layout_height="wrap_content" tools:text="Завтра: 18°C, Облачно" />
-        <TextView android:id="@+id/tvDay2" android:layout_width="match_parent" android:layout_height="wrap_content" tools:text="Послезавтра: 17°C, Дождь" />
-        <TextView android:id="@+id/tvDay3" android:layout_width="match_parent" android:layout_height="wrap_content" tools:text="Через 2 дня: 21°C, Ясно" />
+        <TextView
+            android:id="@+id/tvDay1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Завтра: 18°C, Облачно" />
+
+        <TextView
+            android:id="@+id/tvDay2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Послезавтра: 17°C, Дождь" />
+
+        <TextView
+            android:id="@+id/tvDay3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Через 2 дня: 21°C, Ясно" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
