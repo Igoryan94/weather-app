@@ -17,6 +17,9 @@ class SettingsFragment : Fragment() {
     @Inject
     lateinit var repository: WeatherRepository
 
+    @Inject
+    lateinit var factory: SettingsViewModelFactory
+
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private lateinit var settingsViewModel: SettingsViewModel
@@ -24,7 +27,6 @@ class SettingsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -34,6 +36,8 @@ class SettingsFragment : Fragment() {
 
         // Внедряем зависимости
         (requireActivity().application as WeatherApplication).appComponent.inject(this)
+
+        settingsViewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
         // Наблюдаем за геолокацией: если включена, блокируем ручной выбор
         settingsViewModel.useLocation.observe(viewLifecycleOwner) { isGpsEnabled ->

@@ -1,6 +1,7 @@
 package com.igoryan94.weatherapp.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.igoryan94.weatherapp.data.local.AppDatabase
 import com.igoryan94.weatherapp.data.local.WeatherDao
@@ -29,5 +30,13 @@ class DatabaseModule {
     @Singleton
     fun provideWeatherDao(database: AppDatabase): WeatherDao {
         return database.weatherDao()
+    }
+
+    // Добавь этот метод в один из твоих существующих модулей (например, DatabaseModule)
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(context: Context): SharedPreferences {
+        // Создаем файл настроек с именем "weather_app_prefs"
+        return context.getSharedPreferences("weather_app_prefs", Context.MODE_PRIVATE)
     }
 }
