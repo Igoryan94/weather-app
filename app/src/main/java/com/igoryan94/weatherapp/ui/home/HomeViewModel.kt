@@ -3,6 +3,11 @@ package com.igoryan94.weatherapp.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.igoryan94.weatherapp.data.repository.WeatherRepository
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // Вспомогательный класс для состояния экрана
 data class HomeWeatherState(
@@ -14,22 +19,39 @@ data class HomeWeatherState(
     val forecastDays: List<String> = emptyList()
 )
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val repository: WeatherRepository // Внедряем Репозиторий вместо ApiService
+) : ViewModel() {
 
-    private val _weatherState = MutableLiveData<HomeWeatherState>().apply {
-        value = HomeWeatherState(
-            location = "Загрузка...",
-            currentTemp = "--°C",
-            tempRange = "от -- до --",
-            humidity = "Влажность: --%",
-            windSpeed = "Ветер: -- м/с",
-            forecastDays = listOf("...", "...", "...")
-        )
-    }
+    private val _weatherState = MutableLiveData<HomeWeatherState>()
     val weatherState: LiveData<HomeWeatherState> = _weatherState
 
-    // Метод для будущего обновления данных из API
-    fun updateWeather(state: HomeWeatherState) {
-        _weatherState.value = state
+    /**
+     * Вызов загрузки данных из Репозитория.
+     * @param city Название города.
+     */
+    fun fetchCurrentWeather(city: String) {
+        // Показываем состояние загрузки, пока ждем ответ
+        _weatherState.value = HomeWeatherState(location = "Загрузка данных...")
+
+        viewModelScope.launch {
+            try {
+                // Получаем готовый UI-стейт из Репозитория (из Сети или из Кэша)
+                val state = repository.getWeatherData(city)
+                _weatherState.postValue(state)
+            } catch (e: Exception) {
+                // Сюда попадем, только если нет интернета И база данных пуста
+                _weatherState.postValue(HomeWeatherState(location = "Ошибка: ${e.message}"))
+            }
+        }
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+class HomeViewModelFactory @Inject constructor(
+    private val repository: WeatherRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return HomeViewModel(repository) as T
     }
 }
