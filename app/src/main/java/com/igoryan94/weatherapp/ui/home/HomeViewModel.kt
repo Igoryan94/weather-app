@@ -20,7 +20,7 @@ data class HomeWeatherState(
 )
 
 class HomeViewModel @Inject constructor(
-    private val repository: WeatherRepository // Внедряем Репозиторий вместо ApiService
+    private val repository: WeatherRepository
 ) : ViewModel() {
 
     private val _weatherState = MutableLiveData<HomeWeatherState>()
