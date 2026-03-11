@@ -30,7 +30,7 @@ class WeatherRepository @Inject constructor(
                 id = 0, // Перезаписываем всегда первую строку (для текущей погоды)
                 cityName = response.location.name,
                 temperature = "${response.current.tempC.toInt()}°C",
-                condition = "${response.current.condition.text}",
+                condition = response.current.condition.text,
                 date = response.current.lastUpdated ?: "",
                 feelsLike = "Ощущается как: ${response.current.feelsLikeC.toInt()}°C",
                 humidity = "${response.current.humidity}%",
@@ -77,5 +77,19 @@ class WeatherRepository @Inject constructor(
                 ""
             ) // Прокидываем состояние в первый пункт списка
         )
+    }
+
+    /**
+     * Получение списка городов по запросу.
+     */
+    suspend fun searchCities(query: String): List<String> {
+        return try {
+            val cities = apiService.searchCity(apiKey = ApiKey.KEY, query = query)
+            // Преобразуем список DTO в список строк вида "City, Country" для удобства отображения
+            cities.map { "${it.name}, ${it.country}" }
+        } catch (e: Exception) {
+            Log.e("WEATHER_DEBUG", "Ошибка при поиске: ${e.message}")
+            emptyList()
+        }
     }
 }

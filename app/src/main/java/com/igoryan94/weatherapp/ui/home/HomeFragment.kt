@@ -34,8 +34,8 @@ class HomeFragment : Fragment() {
         // Внедряем зависимости
         (requireActivity().application as WeatherApplication).appComponent.inject(this)
 
-        // Получаем ViewModel через фабрику Dagger, если она настроена
-        val homeViewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
+        // Получаем ViewModel через фабрику Dagger
+        homeViewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
         // Подписываемся на изменения состояния погоды
         homeViewModel.weatherState.observe(viewLifecycleOwner) { state ->
@@ -52,8 +52,8 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Выполняем первый запрос для Москвы
-        homeViewModel.fetchCurrentWeather("Moscow")
+        // Выполняем запрос погоды на основе сохраненного города (вместо хардкода "Moscow")
+        homeViewModel.loadWeatherForSavedCity()
     }
 
     override fun onDestroyView() {

@@ -1,5 +1,6 @@
 package com.igoryan94.weatherapp.data.network
 
+import com.igoryan94.weatherapp.data.model.SearchCityDTO
 import com.igoryan94.weatherapp.data.model.WeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -19,4 +20,13 @@ interface WeatherApiService {
         @Query("aqi") aqi: String = "no",
         @Query("lang") lang: String = "ru"
     ): WeatherResponse
+
+    /**
+     * Метод поиска городов по текстовому запросу.
+     */
+    @GET("v1/search.json")
+    suspend fun searchCity(
+        @Query("key") apiKey: String,
+        @Query("q") query: String
+    ): List<SearchCityDTO>
 }
