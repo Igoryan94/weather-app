@@ -13,20 +13,12 @@ class CityAdapter(
 
     private val cities = mutableListOf<String>()
 
-    // Для загрузки ПЕРВОЙ страницы или полного обновления списка
     fun submitList(newCities: List<String>) {
         cities.clear()
         cities.addAll(newCities)
 
         @SuppressLint("NotifyDataSetChanged")
         notifyDataSetChanged()
-    }
-
-    // Для пагинации: добавляем элементы в конец списка
-    fun addItems(newCities: List<String>) {
-        val startPosition = cities.size
-        cities.addAll(newCities)
-        notifyItemRangeInserted(startPosition, newCities.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityViewHolder {
@@ -36,8 +28,7 @@ class CityAdapter(
     }
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
-        val city = cities[position]
-        holder.bind(city)
+        holder.bind(cities[position])
     }
 
     override fun getItemCount(): Int = cities.size
@@ -47,9 +38,7 @@ class CityAdapter(
 
         fun bind(city: String) {
             textView.text = city
-            itemView.setOnClickListener {
-                onCityClick(city)
-            }
+            itemView.setOnClickListener { onCityClick(city) }
         }
     }
 }
