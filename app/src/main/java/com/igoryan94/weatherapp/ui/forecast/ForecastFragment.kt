@@ -4,12 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.igoryan94.weatherapp.WeatherApplication
 import com.igoryan94.weatherapp.databinding.FragmentForecastBinding
+import javax.inject.Inject
 
 class ForecastFragment : Fragment() {
+
+    @Inject
+    lateinit var factory: ForecastViewModelFactory
+
+    private lateinit var forecastViewModel: ForecastViewModel
 
     private var _binding: FragmentForecastBinding? = null
     private val binding get() = _binding!!
@@ -22,24 +30,31 @@ class ForecastFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val forecastViewModel = ViewModelProvider(this).get(ForecastViewModel::class.java)
-
         _binding = FragmentForecastBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        // 1. Инициализация RecyclerView
+        (requireActivity().application as WeatherApplication).appComponent.inject(this)
+
+        forecastViewModel = ViewModelProvider(this, factory)[ForecastViewModel::class.java]
+
+        // Инициализация RecyclerView
         setupRecyclerView()
 
-        // 2. Подписка на данные из ViewModel
-        forecastViewModel.forecastList.observe(viewLifecycleOwner) { newList ->
-            // Когда данные меняются, передаем их в адаптер
-            forecastAdapter.updateData(newList)
+        // Подписка на общее состояние
+        forecastViewModel.state.observe(viewLifecycleOwner) { state ->
+            // Когда данные меняются, передаём их в дальнейшую обработку на UI
+            renderState(state)
         }
 
-        // 3. Запрос на загрузку данных (пока тестовых)
-        forecastViewModel.loadMockData()
+        // Запрос на загрузку данных (пока тестовых)
+        forecastViewModel.loadForecastData()
 
         return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     // Метод для настройки RecyclerView: установка LayoutManager и привязка адаптера
@@ -53,8 +68,26 @@ class ForecastFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun renderState(state: ForecastState) {
+        when (state) {
+            is ForecastState.Loading -> {
+                binding.progressBar.isVisible = true
+                binding.ivError.isVisible = false
+                binding.rvForecast.isVisible = false
+            }
+
+            is ForecastState.Success -> {
+                binding.progressBar.isVisible = false
+                binding.ivError.isVisible = false
+                binding.rvForecast.isVisible = true
+                forecastAdapter.updateData(state.data)
+            }
+
+            is ForecastState.Error -> {
+                binding.progressBar.isVisible = false
+                binding.ivError.isVisible = true
+                binding.rvForecast.isVisible = false
+            }
+        }
     }
 }
