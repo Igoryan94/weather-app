@@ -4,10 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.igoryan94.weatherapp.R
 import com.igoryan94.weatherapp.WeatherApplication
 import com.igoryan94.weatherapp.databinding.FragmentForecastBinding
 import javax.inject.Inject
@@ -31,10 +35,13 @@ class ForecastFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentForecastBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         (requireActivity().application as WeatherApplication).appComponent.inject(this)
-
         forecastViewModel = ViewModelProvider(this, factory)[ForecastViewModel::class.java]
 
         // Инициализация RecyclerView
@@ -46,10 +53,12 @@ class ForecastFragment : Fragment() {
             renderState(state)
         }
 
-        // Запрос на загрузку данных (пока тестовых)
-        forecastViewModel.loadForecastData()
-
-        return root
+        // ВАЖНО: Проверяем, есть ли уже загруженные данные.
+        // Если state пуст (первый запуск), то грузим из сети.
+        // Если мы вернулись по кнопке "Назад", данные уже будут во ViewModel, и сеть дергаться не будет.
+        if (forecastViewModel.state.value == null) {
+            forecastViewModel.loadForecastData()
+        }
     }
 
     override fun onDestroyView() {
@@ -59,7 +68,25 @@ class ForecastFragment : Fragment() {
 
     // Метод для настройки RecyclerView: установка LayoutManager и привязка адаптера
     private fun setupRecyclerView() {
-        forecastAdapter = ForecastAdapter() // Создаем пустой адаптер
+        // Передаем обработчик клика в адаптер
+        forecastAdapter = ForecastAdapter { sharedView, forecastModel ->
+            // Подготавливаем данные для передачи
+            val bundle = bundleOf("selected_forecast" to forecastModel)
+
+            // Связываем View из списка с будущей View на главном экране
+            val extras = FragmentNavigatorExtras(
+                sharedView to "home_shared_element_target"
+            )
+
+            // Выполняем переход
+            findNavController().navigate(
+                R.id.action_forecastFragment_to_homeFragment,
+                bundle,
+                null,
+                extras
+            )
+        }
+
         binding.rvForecast.apply {
             // LinearLayoutManager располагает элементы вертикальным списком (уже задано в XML, но дублируем для надежности)
             layoutManager = LinearLayoutManager(context)

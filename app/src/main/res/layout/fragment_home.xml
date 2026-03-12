@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
     android:padding="16dp"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.home.HomeFragment"
+    android:transitionName="home_shared_element_target">
 
     <!-- FIXME Пофиксить шторку в дневной теме - сейчас она вся будет сливаться с белым фоном... -->
 
