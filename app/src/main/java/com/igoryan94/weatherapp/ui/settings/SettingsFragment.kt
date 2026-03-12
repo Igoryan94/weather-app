@@ -1,9 +1,12 @@
 package com.igoryan94.weatherapp.ui.settings
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.igoryan94.weatherapp.WeatherApplication
@@ -23,6 +26,19 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private lateinit var settingsViewModel: SettingsViewModel
+
+    private val citySearchLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedCity = result.data?.getStringExtra(CitySearchActivity.EXTRA_CITY_NAME)
+            selectedCity?.let {
+                // Обновляем UI и сохраняем выбор города
+                binding.tvCurrentCity.text = it
+                settingsViewModel.setSelectedCity(it)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -57,11 +73,8 @@ class SettingsFragment : Fragment() {
         }
 
         binding.btnSearchCity.setOnClickListener {
-            // Открываем под-окно выбора города, передавая callback для результата
-            val bottomSheet = CitySearchBottomSheet(repository) { selectedCity ->
-                settingsViewModel.setSelectedCity(selectedCity)
-            }
-            bottomSheet.show(parentFragmentManager, "CitySearchBottomSheet")
+            val intent = Intent(requireContext(), CitySearchActivity::class.java)
+            citySearchLauncher.launch(intent)
         }
     }
 

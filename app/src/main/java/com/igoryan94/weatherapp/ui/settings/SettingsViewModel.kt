@@ -25,7 +25,8 @@ class SettingsViewModel @Inject constructor(
     val useLocation: LiveData<Boolean> = _useLocation
 
     // Выбранный город (по умолчанию можно поставить пустую строку или дефолтный)
-    private val _selectedCity = MutableLiveData<String>().apply { value = "Moscow" }
+    private val _selectedCity = MutableLiveData<String>()
+        .apply { value = settingsRepository.getCity() }
     val selectedCity: LiveData<String> = _selectedCity
 
     fun setUseLocation(use: Boolean) {
