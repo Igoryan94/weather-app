@@ -21,8 +21,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     // Состояние: включена ли геолокация
-    private val _useLocation = MutableLiveData<Boolean>().apply { value = true }
+    private val _useLocation = MutableLiveData<Boolean>().apply { value = false }
     val useLocation: LiveData<Boolean> = _useLocation
+    // TODO реализовать поддержку логики геолокации...
 
     // Выбранный город (по умолчанию можно поставить пустую строку или дефолтный)
     private val _selectedCity = MutableLiveData<String>()

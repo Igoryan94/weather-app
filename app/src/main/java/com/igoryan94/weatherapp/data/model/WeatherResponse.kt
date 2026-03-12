@@ -37,3 +37,28 @@ data class ConditionDTO(
     @SerializedName("text") val text: String,
     @SerializedName("icon") val icon: String
 )
+
+
+/**
+ * Объекты для прогноза:
+ */
+data class WeatherForecastResponse(
+    @SerializedName("location") val location: LocationDTO,
+    @SerializedName("current") val current: CurrentDTO,
+    @SerializedName("forecast") val forecast: ForecastDTO
+)
+
+data class ForecastDTO(
+    @SerializedName("forecastday") val forecastDays: List<ForecastDayDTO>
+)
+
+data class ForecastDayDTO(
+    @SerializedName("date") val date: String, // "2026-03-13"
+    @SerializedName("day") val day: DayDTO
+)
+
+data class DayDTO(
+    @SerializedName("maxtemp_c") val maxTempC: Double,
+    @SerializedName("mintemp_c") val minTempC: Double,
+    @SerializedName("condition") val condition: ConditionDTO
+)

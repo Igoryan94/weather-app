@@ -5,7 +5,10 @@ import com.igoryan94.weatherapp.data.local.ApiKey
 import com.igoryan94.weatherapp.data.local.WeatherDao
 import com.igoryan94.weatherapp.data.local.WeatherEntity
 import com.igoryan94.weatherapp.data.network.WeatherApiService
+import com.igoryan94.weatherapp.ui.forecast.ForecastDayUiModel
 import com.igoryan94.weatherapp.ui.home.HomeWeatherState
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 class WeatherRepository @Inject constructor(
@@ -42,7 +45,6 @@ class WeatherRepository @Inject constructor(
 
             // Возвращаем стейт для UI, сформированный из полученных данных
             mapEntityToUiState(entityToCache, isCached = false)
-
         } catch (networkException: Exception) {
             // Ошибка сети. Ищем данные в БД
             val cachedEntity = weatherDao.getCachedWeather()
@@ -54,6 +56,28 @@ class WeatherRepository @Inject constructor(
                 // Если кэша нет и сети нет - пробрасываем ошибку дальше во ViewModel
                 throw Exception("Сеть недоступна, а кэш пуст: ${networkException.message}")
             }
+        }
+    }
+
+    /**
+     * Получение прогноза на 7 дней.
+     * Сначала узнаем, какой город выбран пользователем (из локальной БД).
+     */
+    suspend fun getForecastData(targetCity: String): List<ForecastDayUiModel> {
+        val response = apiService.getForecastWeather(
+            apiKey = ApiKey.KEY,
+            city = targetCity,
+            days = 7
+        )
+
+        // Маппим сетевые DTO в удобные для RecyclerView UI-модели
+        return response.forecast.forecastDays.map { dayDto ->
+            ForecastDayUiModel(
+                date = formatApiDate(dayDto.date), // TODO добавить форматирование даты (например, "12 окт, пн")
+                tempDay = "${dayDto.day.maxTempC.toInt()}°C",
+                tempNight = "Ночью: ${dayDto.day.minTempC.toInt()}°C",
+                condition = dayDto.day.condition.text
+            )
         }
     }
 
@@ -90,6 +114,26 @@ class WeatherRepository @Inject constructor(
         } catch (e: Exception) {
             Log.e("WEATHER_DEBUG", "Ошибка при поиске: ${e.message}")
             emptyList()
+        }
+    }
+
+    /**
+     * Форматирование даты для читаемого вида
+     * @param dateInput Исходная дата с сервера
+     */
+    private fun formatApiDate(dateInput: String): String {
+        // Формат, в котором дата приходит от API
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+
+        // Формат, который мы хотим получить: "d MMMM, EE"
+        // d - день (без нуля), MMMM - полное название месяца, EE - сокращенный день недели
+        val outputFormat = SimpleDateFormat("d MMMM, EE", Locale("ru"))
+
+        return try {
+            val date = inputFormat.parse(dateInput)
+            date?.let { outputFormat.format(it).lowercase() } ?: dateInput
+        } catch (_: Exception) {
+            dateInput // Если что-то пошло не так, вернем как было
         }
     }
 }
