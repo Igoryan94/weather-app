@@ -27,5 +27,10 @@
 
         </activity>
 
+        <activity
+            android:name=".ui.settings.CitySearchActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WeatherApp.NoActionBar" />
+
     </application>
 </manifest>
