@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-parcelize")
     id("kotlin-kapt")
 }
 
@@ -64,7 +65,7 @@ dependencies {
     // Dagger 2 для DI
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
-    
+
     // Room
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")

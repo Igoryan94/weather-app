@@ -15,7 +15,16 @@
         android:id="@+id/navigation_forecast"
         android:name="com.igoryan94.weatherapp.ui.forecast.ForecastFragment"
         android:label="@string/title_forecast"
-        tools:layout="@layout/fragment_forecast" />
+        tools:layout="@layout/fragment_forecast">
+
+        <action
+            android:id="@+id/action_forecastFragment_to_homeFragment"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_settings"
