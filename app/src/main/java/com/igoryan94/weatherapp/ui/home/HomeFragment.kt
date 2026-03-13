@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.createBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionInflater
@@ -59,6 +60,13 @@ class HomeFragment : Fragment() {
             )
         }
 
+        binding.btnShare.setOnClickListener {
+            // Мы передаем binding.root, чтобы сделать скриншот всего экрана.
+            // Или можно передать конкретный CardView с погодой.
+            val screenshot = getBitmapFromView(binding.root)
+            shareScreenshot(screenshot)
+        }
+
         // Проверяем, пришли ли мы сюда из списка прогнозов
         val passedForecast =
             arguments?.getParcelable("selected_forecast", ForecastDayUiModel::class.java)
@@ -107,6 +115,70 @@ class HomeFragment : Fragment() {
             tvHumidity.text = humidity
             tvWindSpeed.text = windSpeed
             tvState.text = condition
+        }
+    }
+
+    /**
+     * Функция для создания Bitmap (изображения) из переданной View.
+     * @param view Корневой элемент макета, который нужно "сфотографировать".
+     * @return Сформированное изображение в формате Bitmap.
+     */
+    private fun getBitmapFromView(view: View): android.graphics.Bitmap {
+        // Создаем пустой Bitmap с размерами нашей View
+        val bitmap = createBitmap(view.width, view.height)
+        // Создаем Canvas (холст), привязанный к этому Bitmap
+        val canvas = android.graphics.Canvas(bitmap)
+        // Рисуем текущее состояние View на этот холст
+        view.draw(canvas)
+        return bitmap
+    }
+
+    /**
+     * Функция для сохранения Bitmap в кэш и вызова системного диалога "Поделиться".
+     * @param bitmap Изображение для отправки.
+     */
+    private fun shareScreenshot(bitmap: android.graphics.Bitmap) {
+        try {
+            // Подготовка папки в кэше приложения
+            val cachePath = java.io.File(requireContext().cacheDir, "images")
+            cachePath.mkdirs() // Создаем папку, если её нет
+
+            // Создание файла
+            val file = java.io.File(cachePath, "weather_screenshot.png")
+            val fileOutputStream = java.io.FileOutputStream(file)
+
+            // Сжатие Bitmap в файл (формат PNG, качество 100%)
+            bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+
+            // Получение безопасного URI через наш FileProvider
+            val contentUri = androidx.core.content.FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
+                file
+            )
+
+            // Формирование Intent для отправки
+            if (contentUri != null) {
+                val shareIntent = android.content.Intent().apply {
+                    action = android.content.Intent.ACTION_SEND
+                    // Добавляем флаг доступа на чтение для принимающего приложения
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    setDataAndType(contentUri, requireContext().contentResolver.getType(contentUri))
+                    putExtra(android.content.Intent.EXTRA_STREAM, contentUri)
+                    type = "image/png"
+                }
+                // Запуск окна выбора приложений
+                startActivity(
+                    android.content.Intent.createChooser(
+                        shareIntent,
+                        "Поделиться погодой"
+                    )
+                )
+            }
+        } catch (e: java.io.IOException) {
+            e.printStackTrace()
         }
     }
 }
