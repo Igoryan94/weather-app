@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.igoryan94.weatherapp.data.repository.SettingsRepository
 import com.igoryan94.weatherapp.data.repository.WeatherRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,17 +21,34 @@ data class HomeWeatherState(
 )
 
 class HomeViewModel @Inject constructor(
-    private val repository: WeatherRepository // Внедряем Репозиторий вместо ApiService
+    private val repository: WeatherRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _weatherState = MutableLiveData<HomeWeatherState>()
     val weatherState: LiveData<HomeWeatherState> = _weatherState
 
     /**
-     * Вызов загрузки данных из Репозитория.
-     * @param city Название города.
+     * Главный метод инициализации.
+     * Достает город из памяти, форматирует его и запрашивает погоду.
      */
-    fun fetchCurrentWeather(city: String) {
+    fun loadWeatherForSavedCity() {
+        // Получаем полную строку из памяти (например, "Moscow, Russia")
+        val fullLocation = settingsRepository.getCity()
+
+        // Парсим строку: берем всё до первой запятой и удаляем лишние пробелы.
+        // Если запятой нет (например, пользователь ввел просто "Kazan"), вернет всю строку.
+        val cityForApi = fullLocation.substringBefore(",").trim()
+
+        // Вызываем метод запроса в сеть с уже отформатированным названием
+        fetchCurrentWeather(cityForApi)
+    }
+
+    /**
+     * Внутренний метод загрузки данных из Репозитория.
+     * @param city Очищенное название города (например, "Moscow").
+     */
+    private fun fetchCurrentWeather(city: String) {
         // Показываем состояние загрузки, пока ждем ответ
         _weatherState.value = HomeWeatherState(location = "Загрузка данных...")
 
@@ -49,9 +67,10 @@ class HomeViewModel @Inject constructor(
 
 @Suppress("UNCHECKED_CAST")
 class HomeViewModelFactory @Inject constructor(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return HomeViewModel(repository) as T
+        return HomeViewModel(repository, settingsRepository) as T
     }
 }
