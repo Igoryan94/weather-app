@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.room.Room
 import com.igoryan94.weatherapp.data.local.AppDatabase
 import com.igoryan94.weatherapp.data.local.WeatherDao
+import com.igoryan94.weatherapp.data.local.dao.NotificationDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -38,5 +39,16 @@ class DatabaseModule {
     fun provideSharedPreferences(context: Context): SharedPreferences {
         // Создаем файл настроек с именем "weather_app_prefs"
         return context.getSharedPreferences("weather_app_prefs", Context.MODE_PRIVATE)
+    }
+
+    /**
+     * Провайдер для NotificationDao.
+     * @param database Экземпляр базы данных, который Dagger создаст с помощью метода выше.
+     * @return Реализация NotificationDao, сгенерированная Room.
+     */
+    @Provides
+    @Singleton
+    fun provideNotificationDao(database: AppDatabase): NotificationDao {
+        return database.notificationDao()
     }
 }

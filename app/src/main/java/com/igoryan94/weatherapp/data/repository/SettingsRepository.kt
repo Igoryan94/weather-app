@@ -13,6 +13,9 @@ class SettingsRepository @Inject constructor(
 
         // Значение по умолчанию на случай, если пользователь зашел в первый раз
         private const val DEFAULT_CITY = "Moscow, Russia"
+
+        //
+        private const val GPS_STATE = "is_getting_weather_for_current_location"
     }
 
     /**
@@ -29,5 +32,21 @@ class SettingsRepository @Inject constructor(
      */
     fun getCity(): String {
         return prefs.getString(KEY_CITY, DEFAULT_CITY) ?: DEFAULT_CITY
+    }
+
+    /**
+     * Сохраняет состояние переключателя GPS.
+     * @param isEnabled true - если GPS включен, false - если выключен.
+     */
+    fun saveGpsState(isEnabled: Boolean) {
+        prefs.edit { putBoolean(GPS_STATE, isEnabled) }
+    }
+
+    /**
+     * Возвращает сохраненное состояние переключателя GPS.
+     * По умолчанию возвращает false (выключено).
+     */
+    fun isGpsEnabled(): Boolean {
+        return prefs.getBoolean(GPS_STATE, false)
     }
 }
