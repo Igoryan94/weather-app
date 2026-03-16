@@ -18,7 +18,12 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.igoryan94.weatherapp.MainActivity
+import com.igoryan94.weatherapp.R
 import com.igoryan94.weatherapp.WeatherApplication
+import com.igoryan94.weatherapp.data.repository.SettingsRepository.Companion.THEME_DARK
+import com.igoryan94.weatherapp.data.repository.SettingsRepository.Companion.THEME_LIGHT
+import com.igoryan94.weatherapp.data.repository.SettingsRepository.Companion.THEME_SYSTEM
 import com.igoryan94.weatherapp.data.repository.WeatherRepository
 import com.igoryan94.weatherapp.databinding.FragmentSettingsBinding
 import com.igoryan94.weatherapp.notifications.WeatherAlarmScheduler
@@ -129,6 +134,32 @@ class SettingsFragment : Fragment() {
         binding.btnSearchCity.setOnClickListener {
             val intent = Intent(requireContext(), CitySearchActivity::class.java)
             citySearchLauncher.launch(intent)
+        }
+
+        // Устанавливаем текущее состояние из памяти БЕЗ анимации
+        val savedMode = settingsViewModel.getSavedThemeMode()
+        val checkedId = when (savedMode) {
+            1 -> R.id.rbLight
+            2 -> R.id.rbDark
+            else -> R.id.rbSystem
+        }
+        binding.rgTheme.check(checkedId)
+
+        // Вешаем слушатель на изменения
+        binding.rgTheme.setOnCheckedChangeListener { group, id ->
+            // Определяем, какой режим выбрал пользователь
+            val selectedMode = when (id) {
+                R.id.rbLight -> THEME_LIGHT
+                R.id.rbDark -> THEME_DARK
+                else -> THEME_SYSTEM
+            }
+
+            // Сохраняем в настройки
+            settingsViewModel.saveThemeMode(selectedMode)
+
+            // Вызываем анимацию в MainActivity
+            // Передаём саму RadioGroup (group) как точку начала анимации (центр круга)
+            (requireActivity() as MainActivity).changeThemeWithAnimation(selectedMode, group)
         }
     }
 

@@ -25,6 +25,10 @@ class SettingsViewModel @Inject constructor(
     private val _isGpsEnabled = MutableLiveData<Boolean>()
     val isGpsEnabled: LiveData<Boolean> = _isGpsEnabled
 
+    // LiveData для работы с темой
+    private val _themeMode = MutableLiveData<Int>()
+    val themeMode: LiveData<Int> = _themeMode
+
     private val _text = MutableLiveData<String>()
     val text: LiveData<String> = _text
 
@@ -105,6 +109,21 @@ class SettingsViewModel @Inject constructor(
      */
     fun getCurrentCity(): String {
         return settingsRepository.getCity()
+    }
+
+    /**
+     * Сохраняет выбранную тему и уведомляет UI (через репозиторий/префы).
+     */
+    fun saveThemeMode(mode: Int) {
+        settingsRepository.saveThemeMode(mode)
+        // Если у тебя есть LiveData для темы, можно обновить и её
+    }
+
+    /**
+     * Получает текущую сохраненную тему для установки начального состояния RadioButton.
+     */
+    fun getSavedThemeMode(): Int {
+        return settingsRepository.getThemeMode()
     }
 }
 

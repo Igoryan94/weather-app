@@ -1,6 +1,7 @@
 package com.igoryan94.weatherapp.di
 
 import android.content.Context
+import com.igoryan94.weatherapp.WeatherApplication
 import com.igoryan94.weatherapp.notifications.WeatherNotificationReceiver
 import com.igoryan94.weatherapp.ui.forecast.ForecastFragment
 import com.igoryan94.weatherapp.ui.home.HomeFragment
@@ -13,6 +14,8 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [NetworkModule::class, DatabaseModule::class])
 interface ApplicationComponent {
+
+    fun inject(application: WeatherApplication)
 
     fun inject(fragment: HomeFragment)
 
