@@ -3,6 +3,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:name=".WeatherApplication"
         android:allowBackup="true"
@@ -31,6 +35,14 @@
             android:name=".ui.settings.CitySearchActivity"
             android:exported="false"
             android:theme="@style/Theme.WeatherApp.NoActionBar" />
+
+        <receiver
+            android:name=".notifications.WeatherNotificationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.igoryan94.weatherapp.ACTION_DAILY_WEATHER" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"
