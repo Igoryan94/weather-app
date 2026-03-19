@@ -53,10 +53,10 @@ class HomeFragment : Fragment() {
             populateUi(
                 location = state.location,
                 currentTemp = state.currentTemp,
-                tempRange = state.tempRange,
+                feelsLike = state.feelsLike,
+                condition = state.condition,
                 humidity = state.humidity,
                 windSpeed = state.windSpeed,
-                condition = state.forecastDays.getOrNull(0) ?: ""
             )
         }
 
@@ -79,7 +79,7 @@ class HomeFragment : Fragment() {
             populateUi(
                 location = "Прогноз на: ${passedForecast.date}", // Показываем выбранную дату
                 currentTemp = passedForecast.tempDay,
-                tempRange = passedForecast.tempNight, // В качестве диапазона выводим ночную
+                feelsLike = passedForecast.tempNight, // В качестве диапазона выводим ночную
                 humidity = "—", // В API прогноза влажность может быть в другом поле, пока ставим прочерк
                 windSpeed = "—",
                 condition = passedForecast.condition
@@ -103,7 +103,7 @@ class HomeFragment : Fragment() {
     private fun populateUi(
         location: String,
         currentTemp: String,
-        tempRange: String,
+        feelsLike: String,
         humidity: String,
         windSpeed: String,
         condition: String
@@ -111,7 +111,7 @@ class HomeFragment : Fragment() {
         with(binding) {
             tvLocation.text = location
             tvCurrentTemp.text = currentTemp
-            tvTempRange.text = tempRange
+            tvTempRange.text = feelsLike
             tvHumidity.text = humidity
             tvWindSpeed.text = windSpeed
             tvState.text = condition

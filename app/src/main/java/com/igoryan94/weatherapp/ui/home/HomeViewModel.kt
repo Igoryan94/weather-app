@@ -17,7 +17,8 @@ import javax.inject.Inject
 data class HomeWeatherState(
     val location: String = "",
     val currentTemp: String = "",
-    val tempRange: String = "",
+    val feelsLike: String = "",
+    val condition: String = "",
     val humidity: String = "",
     val windSpeed: String = "",
     val forecastDays: List<String> = emptyList()
@@ -75,9 +76,11 @@ class HomeViewModel @Inject constructor(
         _weatherState.value = HomeWeatherState(location = "Загрузка данных...")
 
         viewModelScope.launch {
+            val isCelsius = settingsRepository.getUnits() == "metric"
+
             try {
                 // Получаем готовый UI-стейт из Репозитория (из Сети или из Кэша)
-                val state = repository.getWeatherData(city)
+                val state = repository.getWeatherData(city, isCelsius)
                 _weatherState.postValue(state)
             } catch (e: Exception) {
                 // Сюда попадем, только если нет интернета И база данных пуста

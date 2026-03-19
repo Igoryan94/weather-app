@@ -73,13 +73,20 @@ class SettingsViewModel @Inject constructor(
      * @param cityName Название города для прогноза.
      * @param isEnabled Состояние переключателя.
      */
-    fun saveNotificationSettings(hour: Int, minute: Int, cityName: String, isEnabled: Boolean) {
+    fun saveNotificationSettings(
+        hour: Int,
+        minute: Int,
+        cityName: String,
+        isCelsius: Boolean,
+        isEnabled: Boolean
+    ) {
         viewModelScope.launch {
             val entity = NotificationEntity(
                 id = 1,
                 hour = hour,
                 minute = minute,
                 cityName = cityName,
+                isCelsius = isCelsius,
                 isEnabled = isEnabled
             )
             // Сохраняем в Room
@@ -124,6 +131,20 @@ class SettingsViewModel @Inject constructor(
      */
     fun getSavedThemeMode(): Int {
         return settingsRepository.getThemeMode()
+    }
+
+    /**
+     * Сохраняет выбранные единицы измерения ("metric" или "imperial").
+     */
+    fun saveUnits(units: String) {
+        settingsRepository.saveUnits(units)
+    }
+
+    /**
+     * Получает текущие единицы измерения для установки состояния RadioButton.
+     */
+    fun getUnits(): String {
+        return settingsRepository.getUnits()
     }
 }
 

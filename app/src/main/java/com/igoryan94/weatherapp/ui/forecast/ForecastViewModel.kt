@@ -32,8 +32,10 @@ class ForecastViewModel @Inject constructor(
                 val fullLocation = settingsRepository.getCity()
                 // Парсинг города
                 val cityForApi = fullLocation.substringBefore(",").trim()
+                // Параметр единиц измерения
+                val isCelsius = settingsRepository.getUnits() == "metric"
 
-                val data = repository.getForecastData(cityForApi)
+                val data = repository.getForecastData(cityForApi, isCelsius)
 
                 // Отметка об успехе операции
                 _state.value = ForecastState.Success(data)

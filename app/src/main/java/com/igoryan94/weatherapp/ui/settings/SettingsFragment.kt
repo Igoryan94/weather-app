@@ -6,6 +6,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -136,6 +137,27 @@ class SettingsFragment : Fragment() {
             citySearchLauncher.launch(intent)
         }
 
+        // Установка начального состояния при входе на экран
+        val currentUnit = settingsViewModel.getUnits() // "metric" или "imperial"
+        if (currentUnit == "metric") {
+            binding.toggleUnits.check(R.id.btnMetric)
+        } else {
+            binding.toggleUnits.check(R.id.btnImperial)
+        }
+
+        // Сохранение через правильный слушатель
+        binding.toggleUnits.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            // Проверяем isChecked, чтобы код не срабатывал дважды
+            // (один раз для развыбора старой кнопки, второй — для выбора новой)
+            if (isChecked) {
+                val unit = if (checkedId == R.id.btnMetric) "metric" else "imperial"
+                settingsViewModel.saveUnits(unit)
+
+                // Для отладки
+                Log.d("SETTINGS", "Selected unit: $unit")
+            }
+        }
+
         // Устанавливаем текущее состояние из памяти БЕЗ анимации
         val savedMode = settingsViewModel.getSavedThemeMode()
         val checkedId = when (savedMode) {
@@ -258,7 +280,13 @@ class SettingsFragment : Fragment() {
                 alarmScheduler.cancelAlarm()
             }
 
-            settingsViewModel.saveNotificationSettings(hour, minute, targetCity, isChecked)
+            settingsViewModel.saveNotificationSettings(
+                hour,
+                minute,
+                targetCity,
+                settingsViewModel.getUnits() == "metric",
+                isChecked
+            )
         }
     }
 
@@ -296,6 +324,7 @@ class SettingsFragment : Fragment() {
                     selectedHour,
                     selectedMinute,
                     targetCity,
+                    settingsViewModel.getUnits() == "metric",
                     isEnabled = true
                 )
             }
