@@ -1,11 +1,14 @@
 package com.igoryan94.weatherapp.ui.home
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.igoryan94.weatherapp.data.repository.SettingsRepository
+import com.igoryan94.weatherapp.data.repository.SettingsRepository.Companion.KEY_CITY
+import com.igoryan94.weatherapp.data.repository.SettingsRepository.Companion.KEY_UNITS
 import com.igoryan94.weatherapp.data.repository.WeatherRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +30,25 @@ class HomeViewModel @Inject constructor(
 
     private val _weatherState = MutableLiveData<HomeWeatherState>()
     val weatherState: LiveData<HomeWeatherState> = _weatherState
+
+    private val preferenceChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == KEY_UNITS || key == KEY_CITY) {
+                // Если изменились единицы — просто перечитываем данные из репозитория (они возьмутся из кэша Room)
+                loadWeatherForSavedCity()
+            }
+        }
+
+    init {
+        // 2. Подписываемся на изменения через репозиторий при создании ViewModel
+        settingsRepository.registerListener(preferenceChangeListener)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Важно отписаться, чтобы не было утечки памяти!
+        settingsRepository.unregisterListener(preferenceChangeListener)
+    }
 
     /**
      * Главный метод инициализации.

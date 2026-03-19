@@ -55,6 +55,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    // Геолокация
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+
     // Retrofit для сетевых запросов
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -67,8 +70,7 @@ dependencies {
     kapt(libs.dagger.compiler)
 
     // Room
-    val roomVersion = "2.6.1"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
 }
