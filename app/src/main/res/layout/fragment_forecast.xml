@@ -13,6 +13,7 @@
         android:layout_marginStart="16dp"
         android:paddingTop="16dp"
         android:text="Прогноз на 7 дней"
+        android:textColor="@color/purple_200"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
