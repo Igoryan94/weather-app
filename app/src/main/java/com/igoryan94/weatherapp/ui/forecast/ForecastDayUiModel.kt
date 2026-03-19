@@ -9,5 +9,6 @@ data class ForecastDayUiModel(
     val date: String,       // Например, "Пн, 12 Окт"
     val tempDay: String,    // Например, "+18°C"
     val tempNight: String,  // Например, "+10°C"
+    val feelsLike: String = "",
     val condition: String   // Например, "Солнечно"
 ) : Parcelable

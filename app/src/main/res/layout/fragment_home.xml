@@ -7,7 +7,7 @@
     android:padding="16dp"
     android:transitionName="home_shared_element_target"
     tools:context=".ui.home.HomeFragment">
-    
+
     <TextView
         android:id="@+id/tvLocation"
         android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvLocation" />
 
     <TextView
-        android:id="@+id/tvTempRange"
+        android:id="@+id/tvFeelsLike"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:alpha="0.6"
@@ -56,7 +56,7 @@
         android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTempRange" />
+        app:layout_constraintTop_toBottomOf="@id/tvFeelsLike" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clDetailsContainer"
