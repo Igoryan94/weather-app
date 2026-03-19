@@ -7,6 +7,8 @@ import com.igoryan94.weatherapp.data.local.WeatherEntity
 import com.igoryan94.weatherapp.data.network.WeatherApiService
 import com.igoryan94.weatherapp.ui.forecast.ForecastDayUiModel
 import com.igoryan94.weatherapp.ui.home.HomeWeatherState
+import okio.IOException
+import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -45,7 +47,7 @@ class WeatherRepository @Inject constructor(
 
             // Возвращаем стейт для UI, сформированный из полученных данных
             mapEntityToUiState(entityToCache, isCached = false)
-        } catch (networkException: Exception) {
+        } catch (e: Exception) {
             // Ошибка сети. Ищем данные в БД
             val cachedEntity = weatherDao.getCachedWeather()
 
@@ -53,8 +55,13 @@ class WeatherRepository @Inject constructor(
                 // Если кэш есть - отдаем его, помечая, что данные устаревшие
                 mapEntityToUiState(cachedEntity, isCached = true)
             } else {
-                // Если кэша нет и сети нет - пробрасываем ошибку дальше во ViewModel
-                throw Exception("Сеть недоступна, а кэш пуст: ${networkException.message}")
+                // Если и в кэше пусто (первый запуск), пробрасываем ошибку дальше в ViewModel
+                val errorMessage = when (e) {
+                    is IOException -> "Нет подключения к интернету"
+                    is HttpException -> "Ошибка сервера: ${e.code()}"
+                    else -> "Непредвиденная ошибка"
+                }
+                throw Exception(errorMessage)
             }
         }
     }
@@ -95,11 +102,7 @@ class WeatherRepository @Inject constructor(
             tempRange = entity.feelsLike,
             humidity = entity.humidity,
             windSpeed = entity.windSpeed,
-            forecastDays = listOf(
-                entity.condition,
-                "",
-                ""
-            ) // Прокидываем состояние в первый пункт списка
+            forecastDays = emptyList()
         )
     }
 
