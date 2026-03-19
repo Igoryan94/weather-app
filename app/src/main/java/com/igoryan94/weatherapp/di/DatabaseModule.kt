@@ -21,7 +21,9 @@ class DatabaseModule {
     fun provideDatabase(context: Context): AppDatabase {
         return Room.databaseBuilder(
             context, AppDatabase::class.java, "weather_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration() // Позволяет не писать миграции во время разработки
+            .build()
     }
 
     /**
