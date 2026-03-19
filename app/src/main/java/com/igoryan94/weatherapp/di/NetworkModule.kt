@@ -43,12 +43,12 @@ class NetworkModule {
         // Собираем сам клиент, применяя перехватчики и устанавливая новые таймауты
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(userAgentInterceptor)
-            .connectTimeout(15, TimeUnit.SECONDS)
+            //.addInterceptor(userAgentInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
             // Время на установку соединения с сервером
-            .readTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
             // Время ожидания получения данных (чтение ответа)
-            .writeTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
             // Время ожидания отправки данных на сервер
             .build()
     }
