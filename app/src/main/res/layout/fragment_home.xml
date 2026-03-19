@@ -4,57 +4,55 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize"
     android:padding="16dp"
-    tools:context=".ui.home.HomeFragment"
-    android:transitionName="home_shared_element_target">
-
-    <!-- FIXME Пофиксить шторку в дневной теме - сейчас она вся будет сливаться с белым фоном... -->
-
+    android:transitionName="home_shared_element_target"
+    tools:context=".ui.home.HomeFragment">
+    
     <TextView
         android:id="@+id/tvLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:text="Москва"
+        android:textColor="@color/purple_500"
         android:textSize="32sp"
-        android:textColor="@color/text_title"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="Москва" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvCurrentTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textSize="96sp"
-        android:textColor="@color/text_title"
         android:fontFamily="sans-serif-light"
+        android:text="20°"
+        android:textColor="@color/text_title"
+        android:textSize="96sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvLocation"
-        android:text="20°" />
+        app:layout_constraintTop_toBottomOf="@id/tvLocation" />
 
     <TextView
         android:id="@+id/tvTempRange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
         android:alpha="0.6"
+        android:text="Ощущается как: 18°C"
+        android:textColor="@color/purple_500"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvCurrentTemp"
-        android:text="Ощущается как: 18°C" />
+        app:layout_constraintTop_toBottomOf="@id/tvCurrentTemp" />
 
     <TextView
         android:id="@+id/tvDetailsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="ТЕКУЩИЕ УСЛОВИЯ"
         android:letterSpacing="0.2"
+        android:text="ТЕКУЩИЕ УСЛОВИЯ"
         android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,12 +79,12 @@
             android:id="@+id/tvHumidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:text="45%"
             android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/lblHumidity"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/lblHumidity"
-            android:text="45%" />
+            app:layout_constraintTop_toTopOf="@id/lblHumidity" />
 
         <View
             android:id="@+id/div1"
@@ -109,12 +107,12 @@
             android:id="@+id/tvWindSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:text="5 м/с"
             android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/lblWind"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/lblWind"
-            android:text="5 м/с" />
+            app:layout_constraintTop_toTopOf="@id/lblWind" />
 
         <View
             android:id="@+id/div2"
@@ -137,13 +135,13 @@
             android:id="@+id/tvState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
+            android:text="Солнечно"
             android:textColor="@color/design_default_color_primary"
             android:textSize="16sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/lblCondition"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/lblCondition"
-            android:text="Солнечно" />
+            app:layout_constraintTop_toTopOf="@id/lblCondition" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -153,8 +151,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:src="@android:drawable/ic_menu_share"
-        app:layout_constraintTop_toBottomOf="@+id/clDetailsContainer"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clDetailsContainer" />
 
     <!-- TODO нормальный дизайн! -->
 

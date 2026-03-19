@@ -37,7 +37,7 @@
         <activity
             android:name=".ui.settings.CitySearchActivity"
             android:exported="false"
-            android:theme="@style/Theme.WeatherApp.NoActionBar" />
+            android:theme="@style/Theme.WeatherApp" />
 
         <receiver
             android:name=".notifications.WeatherNotificationReceiver"
