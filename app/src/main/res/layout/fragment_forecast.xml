@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize"
     tools:context=".ui.forecast.ForecastFragment">
 
     <TextView
@@ -14,6 +13,7 @@
         android:layout_marginStart="16dp"
         android:paddingTop="16dp"
         android:text="Прогноз на 7 дней"
+        android:textColor="@color/purple_200"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"

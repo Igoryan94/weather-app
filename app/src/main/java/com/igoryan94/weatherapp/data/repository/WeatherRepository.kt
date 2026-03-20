@@ -7,6 +7,8 @@ import com.igoryan94.weatherapp.data.local.WeatherEntity
 import com.igoryan94.weatherapp.data.network.WeatherApiService
 import com.igoryan94.weatherapp.ui.forecast.ForecastDayUiModel
 import com.igoryan94.weatherapp.ui.home.HomeWeatherState
+import okio.IOException
+import retrofit2.HttpException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -21,7 +23,7 @@ class WeatherRepository @Inject constructor(
      * @param city Название города для поиска.
      * @return [HomeWeatherState] готовое состояние для UI.
      */
-    suspend fun getWeatherData(city: String): HomeWeatherState {
+    suspend fun getWeatherData(city: String, isCelsius: Boolean): HomeWeatherState {
         return try {
             Log.d("WEATHER_DEBUG", "Repo: Запрос в сеть...")
 
@@ -32,29 +34,34 @@ class WeatherRepository @Inject constructor(
             val entityToCache = WeatherEntity(
                 id = 0, // Перезаписываем всегда первую строку (для текущей погоды)
                 cityName = response.location.name,
-                temperature = "${response.current.tempC.toInt()}°C",
+                temperature = response.current.tempC.toInt().toString(),
                 condition = response.current.condition.text,
                 date = response.current.lastUpdated ?: "",
-                feelsLike = "Ощущается как: ${response.current.feelsLikeC.toInt()}°C",
+                feelsLike = "${response.current.feelsLikeC.toInt()}",
                 humidity = "${response.current.humidity}%",
-                windSpeed = "${(response.current.windKph / 3.6).toInt()} м/с"
+                windSpeed = response.current.windKph.toString()
             )
 
             // Сохраняем в базу Room
             weatherDao.saveWeather(entityToCache)
 
             // Возвращаем стейт для UI, сформированный из полученных данных
-            mapEntityToUiState(entityToCache, isCached = false)
-        } catch (networkException: Exception) {
+            mapEntityToUiState(entityToCache, isCelsius, isCached = false)
+        } catch (e: Exception) {
             // Ошибка сети. Ищем данные в БД
             val cachedEntity = weatherDao.getCachedWeather()
 
             if (cachedEntity != null) {
                 // Если кэш есть - отдаем его, помечая, что данные устаревшие
-                mapEntityToUiState(cachedEntity, isCached = true)
+                mapEntityToUiState(cachedEntity, isCelsius, isCached = true)
             } else {
-                // Если кэша нет и сети нет - пробрасываем ошибку дальше во ViewModel
-                throw Exception("Сеть недоступна, а кэш пуст: ${networkException.message}")
+                // Если и в кэше пусто (первый запуск), пробрасываем ошибку дальше в ViewModel
+                val errorMessage = when (e) {
+                    is IOException -> "Нет подключения к интернету"
+                    is HttpException -> "Ошибка сервера: ${e.code()}"
+                    else -> "Непредвиденная ошибка"
+                }
+                throw Exception(errorMessage)
             }
         }
     }
@@ -63,7 +70,7 @@ class WeatherRepository @Inject constructor(
      * Получение прогноза на 7 дней.
      * Сначала узнаем, какой город выбран пользователем (из локальной БД).
      */
-    suspend fun getForecastData(targetCity: String): List<ForecastDayUiModel> {
+    suspend fun getForecastData(targetCity: String, isCelsius: Boolean): List<ForecastDayUiModel> {
         val response = apiService.getForecastWeather(
             apiKey = ApiKey.KEY,
             city = targetCity,
@@ -72,10 +79,22 @@ class WeatherRepository @Inject constructor(
 
         // Маппим сетевые DTO в удобные для RecyclerView UI-модели
         return response.forecast.forecastDays.map { dayDto ->
+            val tempDay = if (isCelsius) {
+                "${dayDto.day.maxTempC}°C"
+            } else {
+                "${(dayDto.day.maxTempC * 9 / 5) + 32}°F"
+            }
+
+            val tempNight = if (isCelsius) {
+                "${dayDto.day.minTempC}°C"
+            } else {
+                "${(dayDto.day.minTempC * 9 / 5) + 32}°F"
+            }
+
             ForecastDayUiModel(
                 date = formatApiDate(dayDto.date), // TODO добавить форматирование даты (например, "12 окт, пн")
-                tempDay = "${dayDto.day.maxTempC.toInt()}°C",
-                tempNight = "Ночью: ${dayDto.day.minTempC.toInt()}°C",
+                tempDay = "${tempDay.toInt()}",
+                tempNight = "Ночью: ${tempNight.toInt()}",
                 condition = dayDto.day.condition.text
             )
         }
@@ -86,20 +105,40 @@ class WeatherRepository @Inject constructor(
      * @param entity Сущность из БД.
      * @param isCached Флаг, указывающий, взяты ли данные из кэша (чтобы предупредить пользователя).
      */
-    private fun mapEntityToUiState(entity: WeatherEntity, isCached: Boolean): HomeWeatherState {
+    private fun mapEntityToUiState(
+        entity: WeatherEntity, isCelsius: Boolean, isCached: Boolean
+    ): HomeWeatherState {
         val locationText = if (isCached) "${entity.cityName} (Оффлайн)" else entity.cityName
+        val tempVal = entity.temperature.toInt()
+        val windVal = entity.windSpeed.toDoubleOrNull() ?: 0.0
+
+        val displayTemp = if (isCelsius) {
+            "$tempVal°C"
+        } else {
+            "${(tempVal * 9 / 5) + 32}°F"
+        }
+
+        val displayFeels = if (isCelsius) {
+            "${entity.feelsLike}°C"
+        } else {
+            "${(entity.feelsLike.toInt() * 9 / 5) + 32}°F"
+        }
+
+        // Добавим и конвертацию ветра, раз мы за системный подход
+        val displayWind = if (isCelsius) {
+            "${(windVal / 3.6).toInt()} м/с" // км/ч в м/с
+        } else {
+            "${(windVal * 0.621).toInt()} mph" // км/ч в мили/ч
+        }
 
         return HomeWeatherState(
             location = locationText,
-            currentTemp = entity.temperature,
-            tempRange = entity.feelsLike,
+            currentTemp = displayTemp,
+            feelsLike = "Ощущается как: $displayFeels",
+            condition = entity.condition,
             humidity = entity.humidity,
-            windSpeed = entity.windSpeed,
-            forecastDays = listOf(
-                entity.condition,
-                "",
-                ""
-            ) // Прокидываем состояние в первый пункт списка
+            windSpeed = displayWind,
+            forecastDays = emptyList()
         )
     }
 

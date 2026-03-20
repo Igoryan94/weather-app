@@ -55,7 +55,10 @@ class WeatherNotificationReceiver : BroadcastReceiver() {
 
                 if (settings != null && settings.isEnabled) {
                     // 2. Делаем запрос в сеть за свежей погодой
-                    val weatherState = repository.getWeatherData(settings.cityName)
+                    val weatherState = repository.getWeatherData(
+                        settings.cityName,
+                        settings.isCelsius
+                    )
 
                     // 3. Формируем текст уведомления
                     val title = "Доброе утро! Погода в ${settings.cityName}"

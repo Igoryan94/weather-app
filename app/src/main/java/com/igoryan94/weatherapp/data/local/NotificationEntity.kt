@@ -21,6 +21,9 @@ data class NotificationEntity(
     // Город, для которого запрашиваем прогноз утром
     val cityName: String,
 
+    // Единицы отображения температуры и скорости ветра
+    val isCelsius: Boolean,
+
     // Флаг состояния: включено ли уведомление пользователем
     val isEnabled: Boolean
 )
